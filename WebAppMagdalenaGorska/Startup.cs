@@ -59,9 +59,7 @@ namespace WebApp_OpenIDConnect_DotNet
             });
             //services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_CONNECTIONSTRING"]);
             var appInsightsConnString = Configuration.GetSection("ApplicationInsights")
-                .GetValue<string>("ConnectionString")
-            //services.AddDbContext<MovieContext>(options =>
-            //        options.UseSqlServer(Configuration.GetConnectionString("MovieContext")));
+                .GetValue<string>("ConnectionString");
         }
         // </ Configure_service_ref_for_docs_ms >
 
