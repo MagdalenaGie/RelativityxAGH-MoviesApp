@@ -55,9 +55,10 @@ namespace WebApp_OpenIDConnect_DotNet
 
                 return new MovieCosmosService(cosmosClient, dbName, containerName);
             });
-            
-            var appInsightsConnString = Configuration.GetSection("ApplicationInsights")
-                .GetValue<string>("ConnectionString");
+
+            //var appInsightsConnString = Configuration.GetSection("ApplicationInsights")
+            //    .GetValue<string>("ConnectionString");
+            services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_CONNECTIONSTRING"]);
         }
 
         public void Configure(IApplicationBuilder app, IWebHostEnvironment env)
