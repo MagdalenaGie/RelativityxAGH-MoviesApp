@@ -49,10 +49,5 @@ namespace UnitTests.ServicesFake
             _moviesList[index] = movieToUpdate;
             return Task.FromResult(_moviesList[index]);
         }
-
-        Task<List<Movie>> IMovieCosmosService.Get(string sqlCosmosQuery)
-        {
-            throw new NotImplementedException();
-        }
     }
 }

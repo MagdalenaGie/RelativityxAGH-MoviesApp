@@ -31,13 +31,13 @@ namespace AzureProjectMagdalenaGorska.Services
 
         public async Task<Movie> AddAsync(Movie newMovie)
         {
-            var item = await _container.CreateItemAsync<Movie>(newMovie, new PartitionKey(newMovie.Type));
+            var item = await _container.CreateItemAsync(newMovie, new PartitionKey(newMovie.Type));
             return item;
         }
 
         public async Task<Movie> Update(Movie movieToUpdate)
         {
-            var item = await _container.UpsertItemAsync<Movie>(movieToUpdate, new PartitionKey(movieToUpdate.Type));
+            var item = await _container.UpsertItemAsync(movieToUpdate, new PartitionKey(movieToUpdate.Type));
             return item;
         }
 

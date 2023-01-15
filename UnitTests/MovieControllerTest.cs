@@ -4,7 +4,6 @@ using Microsoft.AspNetCore.Mvc;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
 using UnitTests.ServicesFake;
 using WebApp_OpenIDConnect_DotNet.Models;
@@ -15,134 +14,214 @@ namespace UnitTests
 {
     public class MovieControllerTest
     {
-        private readonly MoviesController _controller;
+        private readonly MovieController _controller;
         private readonly IMovieCosmosService _movieCosmosService;
 
         public MovieControllerTest()
         {
             _movieCosmosService = new MovieCosmosServiceFake();
-            _controller = new MoviesController(_movieCosmosService);
+            _controller = new MovieController(_movieCosmosService);
         }
 
-        //[Fact]
-        //public async Task Get_WhenCalled_ReturnsOkResultAsync()
-        //{
-        //    // Act
-        //    var okResult = await _controller.GetAll();
+        [Fact]
+        public async Task GetAll_WhenCalled_ReturnsListOfMoviesAsync()
+        {
+            // Act
+            var result = await _controller.GetAll();
 
-        //    // Assert
-        //    Assert.IsType<OkObjectResult>(okResult);
-        //}
+            // Assert
+            Assert.IsType<List<Movie>>(result);
+            Assert.Equal(3, result?.Count);
+        }
 
-        //[Fact]
-        //public async Task Get_WhenCalled_ReturnsAllItems()
-        //{
-        //    // Act
-        //    OkObjectResult okResult = await _controller.GetAll() as OkObjectResult;
+        [Fact]
+        public async Task Index_WhenCalled_ReturnsCorrectViewModel()
+        {
+            // Act
+            var result = await _controller.Index() as ViewResult;
 
-        //    // Assert
-        //    var items = Assert.IsType<List<Movie>>(okResult.Value);
-        //    Assert.Equal(3, items.Count);
-        //}
+            // Assert
+            Assert.IsType<ViewResult>(result);
+            Assert.IsType<List<Movie>>(result?.ViewData.Model);
+            var movies = result?.ViewData.Model as List<Movie>;
+            Assert.Equal(3, movies.Count);
+        }
 
-        //[Fact]
-        //public async Task Post_WhenCalled_ReturnsOkResultAsync()
-        //{
-        //    // Arrange
-        //    Movie movie = new Movie() { Id = Guid.NewGuid().ToString(), Director = "anana", Title = "SKJSKSK", Type = "dkdkd" };
+        [Fact]
+        public async Task Details_WhenCalled_ReturnsCorrectViewModel()
+        {
+            // Arrange
+            Movie movie = await getExistingMovie();
 
-        //    // Act
-        //    var okResult = await _controller.Post(movie);
+            // Act
+            var result = await _controller.Details(movie.Id) as ViewResult;
 
-        //    // Assert
-        //    Assert.IsType<OkObjectResult>(okResult);
-        //}
+            // Assert
+            Assert.IsType<ViewResult>(result);
+            Assert.IsType<Movie>(result?.ViewData.Model);
+            AssertObjectsAreEquivalents(movie, result?.ViewData.Model as Movie);
+        }
 
-        //[Fact]
-        //public async Task Post_WhenCalled_ReturnsAddedItem()
-        //{
-        //    // Arrange
-        //    Movie movie = new Movie() { Id = Guid.NewGuid().ToString(), Director = "anana", Title = "SKJSKSK", Type = "dkdkd" };
+        [Fact]
+        public async Task Details_WhenIdNotExist_ReturnsNotFound()
+        {
+            // Act
+            var result = await _controller.Details("not valid id");
 
-        //    // Act
-        //    OkObjectResult okResult = await _controller.Post(movie) as OkObjectResult;
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
 
-        //    // Assert
-        //    var item = Assert.IsType<Movie>(okResult.Value);
-        //    AssertObjectsAreEquivalents(item, movie);
-        //}
+        [Fact]
+        public async Task Details_WhenIdIsNull_ReturnsNotFound()
+        {
+            // Act
+            var result = await _controller.Details(null);
 
-        //[Fact]
-        //public async Task Put_WhenCalled_ReturnsOkResultAsync()
-        //{
-        //    // Arrange
-        //    Movie movie = new Movie() { Id = Guid.NewGuid().ToString(), Director = "anana", Title = "SKJSKSK", Type = "dkdkd" };
-        //    var okPostResult = await _controller.Post(movie);
-        //    Movie alteredMovie = new Movie() { Id = movie.Id, Director = "CHANGEDIRECTOR", Title = "SKJSKSK", Type = "dkdkd" };
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
 
-        //    // Act
-        //    var okPutResult = await _controller.Put(alteredMovie);
+        [Fact]
+        public void Create_WhenCalledWithoutArgs_ReturnsCorrectViewModel()
+        {
+            // Act
+            var result = _controller.Create();
 
-        //    // Assert
-        //    Assert.IsType<OkObjectResult>(okPutResult);
-        //}
+            // Assert
+            Assert.IsType<ViewResult>(result);
+            var viewResult = result as ViewResult;
+            Assert.Null(viewResult?.ViewData.Model);
+        }
 
-        //[Fact]
-        //public async Task Put_WhenCalled_ReturnsAlteredItem()
-        //{
-        //    // Arrange
-        //    Movie movie = new Movie() { Id = Guid.NewGuid().ToString(), Director = "anana", Title = "SKJSKSK", Type = "dkdkd" };
-        //    var okPostResult = await _controller.Post(movie);
-        //    Movie alteredMovie = new Movie() { Id = movie.Id, Director = "CHANGEDIRECTOR", Title = "SKJSKSK", Type = "dkdkd" };
+        [Fact]
+        public async Task Create_WhenCalledwithMovieModelPassed_CreatesNewMovie()
+        {
+            // Arrange
+            Movie movie = new Movie() { Id = Guid.NewGuid().ToString(), Director = "anana", Title = "SKJSKSK", Type = "dkdkd" };
 
-        //    // Act
-        //    OkObjectResult okPutResult = await _controller.Put(alteredMovie) as OkObjectResult;
+            // Act
+            var result = await _controller.Create(movie);
 
-        //    // Assert
-        //    var item = Assert.IsType<Movie>(okPutResult.Value);
-        //    AssertObjectsAreEquivalents(item, alteredMovie);
-        //}
+            // Assert
+            Assert.IsType<RedirectToActionResult>(result);
+            var redirect = result as RedirectToActionResult;
+            Assert.Equal("Index", redirect.ActionName);
+        }
 
-        //[Fact]
-        //public async Task Delete_WhenCalled_ReturnsOkResultAsync()
-        //{
-        //    // Arrange
-        //    Movie movie = new Movie() { Id = Guid.NewGuid().ToString(), Director = "anana", Title = "SKJSKSK", Type = "dkdkd" };
-        //    var okPostResult = await _controller.Post(movie);
+        [Fact]
+        public async Task Edit_WhenCalled_ReturnsCorrectViewModel()
+        {
+            // Arrange
+            Movie movie = await getExistingMovie();
 
-        //    // Act
-        //    var okResult = await _controller.Delete(movie.Id, movie.Type);
+            // Act
+            var result = await _controller.Edit(movie.Id) as ViewResult;
 
-        //    // Assert
-        //    Assert.IsType<OkResult>(okResult);
-        //}
+            // Assert
+            Assert.IsType<ViewResult>(result);
+            Assert.IsType<Movie>(result?.ViewData.Model);
+            AssertObjectsAreEquivalents(movie, result?.ViewData.Model as Movie);
+        }
 
-        //[Fact]
-        //public async Task Delete_WhenCalled_DeletesAnItem()
-        //{
-        //    // Arrange
-        //    Movie movie = new Movie() { Id = Guid.NewGuid().ToString(), Director = "anana", Title = "SKJSKSK", Type = "dkdkd" };
-        //    var okPostResult = await _controller.Post(movie);
-        //    OkObjectResult okGetResultBefore = await _controller.GetAll() as OkObjectResult;
-        //    var itemsBefore = Assert.IsType<List<Movie>>(okGetResultBefore.Value);
-        //    Assert.Equal(4, itemsBefore.Count);
+        [Fact]
+        public async Task Edit_WhenIdNotExist_ReturnsNotFound()
+        {
+            // Act
+            var result = await _controller.Edit("not valid id");
 
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
 
-        //    // Act
-        //    var okResult = await _controller.Delete(movie.Id, movie.Type);
+        [Fact]
+        public async Task Edit_WhenIdIsNull_ReturnsNotFound()
+        {
+            // Act
+            var result = await _controller.Edit(null);
 
-        //    // Assert
-        //    OkObjectResult okGetResultAfter = await _controller.GetAll() as OkObjectResult;
-        //    var itemsAfter = Assert.IsType<List<Movie>>(okGetResultAfter.Value);
-        //    Assert.Equal(3, itemsAfter.Count);
-        //}
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
 
-        //private void AssertObjectsAreEquivalents(Movie first, Movie second)
-        //{
-        //    Assert.Equal(first.Id, second.Id);
-        //    Assert.Equal(first.Title, second.Title);
-        //    Assert.Equal(first.Type, second.Type);
-        //    Assert.Equal(first.Director, second.Director);
-        //}
+        [Fact]
+        public async Task Edit_WhenCalledwithMovieModelPassed_RedirectsToIndex()
+        {
+            // Arrange
+            Movie movie = await getExistingMovie();
+            movie.Title = "New title";
+
+            // Act
+            var result = await _controller.Edit(movie.Id, movie);
+
+            // Assert
+            Assert.IsType<RedirectToActionResult>(result);
+            var redirect = result as RedirectToActionResult;
+            Assert.Equal("Index", redirect.ActionName);
+        }
+
+        [Fact]
+        public async Task Delete_WhenCalled_ReturnsCorrectViewModel()
+        {
+            // Arrange
+            Movie movie = await getExistingMovie();
+
+            // Act
+            var result = await _controller.Delete(movie.Id) as ViewResult;
+
+            // Assert
+            Assert.IsType<ViewResult>(result);
+            Assert.IsType<Movie>(result?.ViewData.Model);
+            AssertObjectsAreEquivalents(movie, result?.ViewData.Model as Movie);
+        }
+
+        [Fact]
+        public async Task Delete_WhenIdNotExist_ReturnsNotFound()
+        {
+            // Act
+            var result = await _controller.Edit("not valid id");
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Delete_WhenIdIsNull_ReturnsNotFound()
+        {
+            // Act
+            var result = await _controller.Edit(null);
+
+            // Assert
+            Assert.IsType<NotFoundResult>(result);
+        }
+
+        [Fact]
+        public async Task Delete_WhenCalledwithMovieModelPassed_DeletesMovie()
+        {
+            // Arrange
+            Movie movie = await getExistingMovie();
+
+            // Act
+            var result = await _controller.DeleteConfirmed(movie.Id);
+
+            // Assert
+            Assert.IsType<RedirectToActionResult>(result);
+            var redirect = result as RedirectToActionResult;
+            Assert.Equal("Index", redirect.ActionName);
+        }
+
+        private void AssertObjectsAreEquivalents(Movie first, Movie second)
+        {
+            Assert.Equal(first.Id, second.Id);
+            Assert.Equal(first.Title, second.Title);
+            Assert.Equal(first.Type, second.Type);
+            Assert.Equal(first.Director, second.Director);
+        }
+
+        private async Task<Movie> getExistingMovie()
+        {
+            var movies = await _movieCosmosService.Get("");
+            return movies.First();
+        }
     }
 }
