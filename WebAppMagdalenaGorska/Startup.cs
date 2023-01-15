@@ -64,6 +64,7 @@ namespace WebApp_OpenIDConnect_DotNet
 
                 return new MovieCosmosService(cosmosClient, dbName, containerName);
             });
+            services.AddApplicationInsightsTelemetry(Configuration["APPINSIGHTS_CONNECTIONSTRING"]);
 
             //services.AddDbContext<MovieContext>(options =>
             //        options.UseSqlServer(Configuration.GetConnectionString("MovieContext")));
