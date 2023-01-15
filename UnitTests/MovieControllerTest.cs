@@ -14,13 +14,13 @@ namespace UnitTests
 {
     public class MovieControllerTest
     {
-        private readonly MovieController _controller;
+        private readonly MoviesController _controller;
         private readonly IMovieCosmosService _movieCosmosService;
 
         public MovieControllerTest()
         {
             _movieCosmosService = new MovieCosmosServiceFake();
-            _controller = new MovieController(_movieCosmosService);
+            _controller = new MoviesController(_movieCosmosService);
         }
 
         [Fact]

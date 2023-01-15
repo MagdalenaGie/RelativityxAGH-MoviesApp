@@ -10,12 +10,12 @@ using AzureProjectMagdalenaGorska.Services;
 
 namespace WebAppOpenIDConnectDotNet.Controllers
 {
-    public class MovieController : Controller
+    public class MoviesController : Controller
     {
-        // private readonly MovieContext _context;
+
         public readonly IMovieCosmosService _movieCosmosService;
 
-        public MovieController(IMovieCosmosService movieCosmosService)
+        public MoviesController(IMovieCosmosService movieCosmosService)
         {
             _movieCosmosService = movieCosmosService;
         }
