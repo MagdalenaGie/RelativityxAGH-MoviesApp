@@ -64,9 +64,9 @@ namespace WebAppOpenIDConnectDotNet.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create([Bind("Id,Title,Director,Type")] Movie newMovie)
         {
+            newMovie.Id = Guid.NewGuid().ToString();
             if (ModelState.IsValid)
             {
-                newMovie.Id = Guid.NewGuid().ToString();
                 await _movieCosmosService.AddAsync(newMovie);
                 return RedirectToAction(nameof(Index));
             }
