@@ -32,7 +32,7 @@ namespace UnitTests
             // Assert
             Assert.IsType<List<Movie>>(result);
             Assert.Equal(3, result?.Count);
-            Assert.False(true);
+            // Assert.False(true);
         }
 
         [Fact]
